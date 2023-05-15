@@ -28,7 +28,7 @@ while ($True) {
         # $Date
 
         $HEADERS = @{
-            'Name' = 'main' + $Date + '.xml'
+            'Name' = 'main' + '.xml'
         }
 
         Invoke-WebRequest `
@@ -45,7 +45,7 @@ while ($True) {
 
     # Remove-Item $XML_FILE
 
-    $Sleep_Time = 10
+    $Sleep_Time = 3600
     Start-Sleep -Seconds $Sleep_Time
 
 }
