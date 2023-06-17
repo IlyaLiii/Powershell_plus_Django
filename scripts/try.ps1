@@ -1,49 +1,37 @@
-$IsItter = $False
-while ($IsItter = $True) {
+$URI = 'http://127.0.0.1:8000/'
+$INPUT_DIR = 'C:\projects\pythonProject\Powershell_plus_Django\scripts\xml\*'
+$DONE_DIR = 'C:\projects\pythonProject\Powershell_plus_Django\scripts\sended\'
 
-    $INPUT_DIR = Read-Host "Write dir to check .xml`n EXAMPLES: C:\test\ or .\test\"
-    $INPUT_DIR = $INPUT_DIR + "*" 
-    
-    if (Test-Path -Path $INPUT_DIR) {
-        $Test = $True
-        break
-    }
-    else {
-        Write-host "Directory is invalid"
-    }
-
-}
-    
 while ($True) { 
 
     $IS_EXIT_FILES = Test-Path $INPUT_DIR -PathType Leaf -Include "*.xml"
     
     if ($IS_EXIT_FILES) {
 
-        $XML_FILE = Get-ChildItem $INPUT_DIR -File -Recurse | Select-Object -ExpandProperty FullName -First 1
-        $XML_FILE
-        
-        # $Date = Get-Date -Format "HH.mm.ss"
-        # $Date = $Date.ToLongDateString()
-        # $Date
+        foreach($PATH_TO_FILE in Get-ChildItem $INPUT_DIR -File -Recurse | Select-Object -ExpandProperty FullName -Unique)
 
-        $HEADERS = @{
-            'Name' = 'main' + '.xml'
+        {
+            $NAME_OF_FILE = Get-ChildItem $INPUT_DIR -File -Recurse | Select-Object -First 1
+
+            $HEADERS = @{
+                'Name' = $NAME_OF_FILE
+            }
+
+            Invoke-WebRequest `
+                -Method 'POST' `
+                -Uri $URI `
+                -InFile $PATH_TO_FILE `
+                -Headers $HEADERS
+
+            Copy-Item $PATH_TO_FILE -Destination $DONE_DIR
+            Remove-Item $PATH_TO_FILE
         }
-
-        Invoke-WebRequest `
-            -Method 'POST' `
-            -Uri 'http://127.0.0.1:8000/' `
-            -InFile $XML_FILE `
-            -Headers $HEADERS
 
     }
 
     else {
         Write-host "Xml-files does not exit"
     }
-
-    # Remove-Item $XML_FILE
 
     $Sleep_Time = 3600
     Start-Sleep -Seconds $Sleep_Time
